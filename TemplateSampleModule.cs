@@ -2,13 +2,12 @@ public class TemplateSampleModule : Nancy.NancyModule
 {
     public TemplateSampleModule()
     {
-        Nancy.StaticConfiguration.DisableErrorTraces = false;
-        Get["/hi"] = _ => "Hello";
         Get["/hello"] = Hello;
     }
 
     private dynamic Hello(dynamic parameters)
     {
+        ViewBag.title = "Hello World!";
         return View["hello_world"];
     }
 }
