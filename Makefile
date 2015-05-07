@@ -11,8 +11,7 @@ template_sample:
 package_rebuild: package_clean package_install
 
 package_clean:
-	find . -path ./packages -type d -exec rm -r {} \;
-
+	find . -path './packages/*' -type d -exec rm -r {} \;
 
 package_install:
 	nuget restore packages/packages.config -PackagesDirectory packages

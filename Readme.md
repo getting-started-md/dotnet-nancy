@@ -128,7 +128,7 @@ Create a file named Web.config in your application folder root and fill it with 
 
 ```
 <system.web>
-  <compilation debug="true" targetFramework="4.0" />
+  <compilation debug="true" targetFramework="4.5" />
   <httpHandlers>
     <add verb="*" type="Nancy.Hosting.Aspnet.NancyHttpRequestHandler" path="*"/>
   </httpHandlers>
@@ -289,6 +289,10 @@ all: clean sample template_example
 
 (snip)
 ```
+
+## Templates
+
+.NET is not short on templating libraries, although for general purpose templating Razor seems to be a favorite.
 
 
 
