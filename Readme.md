@@ -1,5 +1,14 @@
 ## Dotnet And Nancy
 
+---
+id: 4
+title: .NET & Nancy
+date: 2015-05-06 18:18:57 -0500
+image: /static/images/nancy.png
+repo: https://github.com/getting-started-md/dotnet-nancy
+summary: A Lightweight, low-ceremony, framework for building HTTP based services on .Net and Mono
+---
+
 ## Background on .NET and OSX/Linux
 
 .NET was originally a windows only product targeted at replacing Java/Visual J++ and Legacy VisualBasic with C# and VisualBasic.NET
@@ -27,7 +36,7 @@ Download and run installer from
 
 or if you have brew cask installed
 
-```
+```bash
 brew cask install mono-mdk
 ```
 
@@ -73,7 +82,7 @@ Create a new folder in your project for packages.
 
 and create a file called packages.config with the following content:
 
-```
+```html
 <?xml version="1.0" encoding="utf-8"?>
 <packages>
   <package id="Nancy" version="1.2.0" />
@@ -91,7 +100,7 @@ Nancy uses what it calls modules but are really classes to define routes. By def
 
 To define an index route, create a file in your application folder named SampleModule.cs and include the content listed below.
 
-```
+```csharp
 public class SampleModule : Nancy.NancyModule
 {
     public SampleModule()
@@ -128,7 +137,7 @@ For more information see: [https://msdn.microsoft.com/en-us/library/aa306178.asp
 
 Create a file named Web.config in your application folder root and fill it with the following content.
 
-```
+```html
 <system.web>
   <compilation debug="true" targetFramework="4.5" />
   <httpHandlers>
@@ -178,7 +187,7 @@ The `-s` flag specifies symbolic links rather than hard-links.
 
 See the manpage for `ln` for more info.
 
-```
+```bash
 ln -s ../packages/Nancy.Hosting.Aspnet.1.2.0/lib/net40/Nancy.Hosting.Aspnet.dll bin/Nancy.Hosting.Aspnet.dll
 ln -s ../packages/Nancy.1.2.0/lib/net40/Nancy.dll bin/Nancy.dll
 ```
@@ -208,7 +217,7 @@ The make command and a Makefile is a great way to do this.
 
 Create a file in your application's root called __Makefile__ with following content.
 
-```
+```bash
 DEPENDENCIES=-r:packages/Nancy.1.2.0/lib/net40/Nancy.dll
 
 all: sample
@@ -226,7 +235,7 @@ Next we define our *all* task.
 
 The all task will just be responsible for running other tasks.
 
-```
+```bash
 all: sample
 ``` 
 
@@ -246,7 +255,7 @@ Now when we update our .cs files, all we need to do is type `make` to recompile 
 
 Adding additional files is as easy as defining additional tasks to compile additional assembiles
 
-```
+```bash
 DEPENDENCIES=-r:packages/Nancy.1.2.0/lib/net40/Nancy.dll
 
 all: sample template_example
@@ -267,7 +276,7 @@ Another useful make task is *clean*.
 
 We can implement this the same way in our Makefile
 
-```
+```bash
 (snip)
 
 clean:
@@ -283,7 +292,7 @@ now running `make clean` will empty our bin folder, and relink our nuget assembl
 
 It might be useful to clean before every build so in our *all* task we can do the following
 
-```
+```bash
 (snip)
 
 all: clean sample template_example
@@ -299,7 +308,7 @@ all: clean sample template_example
 
 First, modify your packages/packages.config by adding
 
-```
+```html
   <package id="Microsoft.AspNet.Razor" version="3.2.3" />
   <package id="Nancy.Viewengines.Razor" version="1.2.0" />
 ```
@@ -308,7 +317,7 @@ to the `<packages>` block
 
 Your file should look like this:
 
-```
+```html
 <packages>
   <package id="Nancy" version="1.2.0" />
   <package id="Nancy.Hosting.Aspnet" version="1.2.0" />
@@ -325,16 +334,18 @@ run `nuget restore packages/packages.config -PackagesDirectory packages` in the 
 
 Open your web.config and add the following lines to the top:
 
+```html
   <configSections>
     <section name="razor" type="Nancy.ViewEngines.Razor.RazorConfigurationSection, Nancy.ViewEngines.Razor" />
   </configSections>
 
   <razor disableAutoIncludeModelNamespace="false">
   </razor>
+```
 
 The complete file should look like this:
 
-```
+```html
 <?xml version="1.0"?>
 <configuration>
 
@@ -371,7 +382,7 @@ To show how an application can load multiple modules, I am suggesting you create
 
 Create a new file in root of your application folder called __TemplateSampleModule.cs__ and add the following:
 
-```
+```csharp
 public class TemplateSampleModule : Nancy.NancyModule
 {
     public TemplateSampleModule()
@@ -405,7 +416,7 @@ First create a views folder in your application's root.
 
 Next create a new file in the views folder called __hello_world.cshtml__ with the following content:
 
-```
+```html
 <!DOCTYPE html>
 <html>
 <body>
@@ -428,14 +439,14 @@ Otherwise you can add it to your Makefile now, or just invoke mcs manually to co
 
 Either from the command line or in our clean task, we should link the required Razor assemblies.
 
-```
-  ln -s ../packages/Nancy.Hosting.Aspnet.1.2.0/lib/net40/Nancy.Hosting.Aspnet.dll bin/Nancy.Hosting.Aspnet.dll
-  ln -s ../packages/Nancy.1.2.0/lib/net40/Nancy.dll bin/Nancy.dll
+```bash
+  ln -s ../packages/Nancy.Viewengines.Razor.1.2.0/lib/net40/Nancy.ViewEngines.Razor.dll bin/Nancy.ViewEngines.Razor.dll
+  ln -s ../packages/Microsoft.AspNet.Razor.3.2.3/lib/net45/System.Web.Razor.dll bin/System.Web.Razor.dll
 ```
 
 or
 
-```
+```bash
 clean:
   rm -rf bin/*
   ln -s ../packages/Nancy.Viewengines.Razor.1.2.0/lib/net40/Nancy.ViewEngines.Razor.dll bin/Nancy.ViewEngines.Razor.dll
