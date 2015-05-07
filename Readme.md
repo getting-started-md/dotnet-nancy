@@ -294,6 +294,137 @@ all: clean sample template_example
 
 .NET is not short on templating libraries, although for general purpose templating Razor seems to be a favorite.
 
+### Installing Razor
 
+First, modify your packages/packages.config by adding
 
+```
+  <package id="Microsoft.AspNet.Razor" version="3.2.3" />
+  <package id="Nancy.Viewengines.Razor" version="1.2.0" />
+```
 
+to the `<packages>` block
+
+Your file should look like this:
+
+```
+<packages>
+  <package id="Nancy" version="1.2.0" />
+  <package id="Nancy.Hosting.Aspnet" version="1.2.0" />
+  <package id="Microsoft.AspNet.Razor" version="3.2.3" />
+  <package id="Nancy.Viewengines.Razor" version="1.2.0" />
+</packages>
+```
+
+Now update your packages:
+
+run `nuget restore packages/packages.config -PackagesDirectory packages` in the root of your application.
+
+### Configure Razor
+
+Open your web.config and add the following lines to the top:
+
+  <configSections>
+    <section name="razor" type="Nancy.ViewEngines.Razor.RazorConfigurationSection, Nancy.ViewEngines.Razor" />
+  </configSections>
+
+  <razor disableAutoIncludeModelNamespace="false">
+  </razor>
+
+The complete file should look like this:
+
+```
+<?xml version="1.0"?>
+<configuration>
+
+  <configSections>
+    <section name="razor" type="Nancy.ViewEngines.Razor.RazorConfigurationSection, Nancy.ViewEngines.Razor" />
+  </configSections>
+
+  <razor disableAutoIncludeModelNamespace="false">
+  </razor>
+
+  <system.web>
+    <compilation debug="true" targetFramework="4.5" />
+    <trace enabled="true" pageOutput="true" requestLimit="40" localOnly="false"/>
+    <httpHandlers>
+      <add verb="*" type="Nancy.Hosting.Aspnet.NancyHttpRequestHandler" path="*"/>
+    </httpHandlers>
+  </system.web>
+
+  <system.webServer>
+    <modules runAllManagedModulesForAllRequests="true"/>
+    <validation validateIntegratedModeConfiguration="false"/>
+    <handlers>
+      <add name="Nancy" verb="*" type="Nancy.Hosting.Aspnet.NancyHttpRequestHandler" path="*"/>
+    </handlers>
+  </system.webServer>
+
+</configuration>
+
+```
+
+### Add a route for your template
+
+To show how an application can load multiple modules, I am suggesting you create a new .cs file to play with templates, however your could just modify your __SampleModule.cs__.
+
+Create a new file in root of your application folder called __TemplateSampleModule.cs__ and add the following:
+
+```
+public class TemplateSampleModule : Nancy.NancyModule
+{
+    public TemplateSampleModule()
+    {
+        Get["/hello"] = Hello;
+    }
+
+    private dynamic Hello(dynamic parameters)
+    {
+        ViewBag.title = "Hello World!";
+        return View["hello_world"];
+    }
+}
+```
+
+As in the previous example we are defining a GET route for /hello, however this time we are pointing it a function instead of a string.
+
+The private function Hello defined below will be run when a client sends a GET request to /hello.
+
+This function sets ViewBag.title to "Hello World!" and the returns the hello_world view.
+
+ViewBag is an object shared with the view and makes it easy to pass variables from the controller to the view.
+
+### Creating our View
+
+Views are stored in a views folder.
+
+First create a views folder in your application's root.
+
+`mkdir -p views`
+
+Next create a new file in the views folder called __hello_world.cshtml__ with the following content:
+
+```
+<!DOCTYPE html>
+<html>
+<body>
+  <h1> @ViewBag.title </h1>
+</body>
+</html>
+```
+
+This will render the value of our ViewBag.title in an H1 tag.
+
+### Compiling our additional module.
+
+If you followed the extra step of adding the *template_example* task to your Makefile all you need to do is run `make`
+
+Otherwise you can add it to your Makefile now, or just invoke mcs manually to compile the additional template.
+
+`mcs -r:packages/Nancy.1.2.0/lib/net40/Nancy.dll -t:library TemplateSampleModule.cs -out:bin/TemplateSampleModule.dll`
+
+### Run the server
+
+Now you can run `xsp4` or `make server`
+
+Navigate to http://localhost:8080/hello and you should be greeted by a large __HELLO WORLD!__
