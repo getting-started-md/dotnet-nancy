@@ -57,7 +57,7 @@ First you want to create a folder for your application. I keep my projects in ~/
 
 then
 
-`mkdir -p nancy_example`
+`mkdir nancy_example`
 
 and finally
 
@@ -69,15 +69,15 @@ First, we want to create our package file. This is an xml document that defines 
 
 Create a new folder in your project for packages.
 
-`mkdir -p packages`
+`mkdir packages`
 
-and create a file called packages.config with the following content:
+and create a file called packages.config in the packages directory with the following content:
 
 ```html
 <?xml version="1.0" encoding="utf-8"?>
 <packages>
-  <package id="Nancy" version="1.2.0" />
-  <package id="Nancy.Hosting.Aspnet" version="1.2.0" />
+  <package id="Nancy" version="1.4.4" />
+  <package id="Nancy.Hosting.Aspnet" version="1.4.1" />
 </packages>
 ```
 
@@ -129,20 +129,23 @@ For more information see: [https://msdn.microsoft.com/en-us/library/aa306178.asp
 Create a file named Web.config in your application folder root and fill it with the following content.
 
 ```html
-<system.web>
-  <compilation debug="true" targetFramework="4.5" />
-  <httpHandlers>
-    <add verb="*" type="Nancy.Hosting.Aspnet.NancyHttpRequestHandler" path="*"/>
-  </httpHandlers>
-</system.web>
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <system.web>
+    <compilation debug="true" targetFramework="4.5" />
+    <httpHandlers>
+      <add verb="*" type="Nancy.Hosting.Aspnet.NancyHttpRequestHandler" path="*"/>
+    </httpHandlers>
+  </system.web>
 
-<system.webServer>
-  <modules runAllManagedModulesForAllRequests="true"/>
-  <validation validateIntegratedModeConfiguration="false"/>
-  <handlers>
-    <add name="Nancy" verb="*" type="Nancy.Hosting.Aspnet.NancyHttpRequestHandler" path="*"/>
-  </handlers>
-</system.webServer>
+  <system.webServer>
+    <modules runAllManagedModulesForAllRequests="true"/>
+    <validation validateIntegratedModeConfiguration="false"/>
+    <handlers>
+      <add name="Nancy" verb="*" type="Nancy.Hosting.Aspnet.NancyHttpRequestHandler" path="*"/>
+    </handlers>
+  </system.webServer>
+</configuration>
 ```
 
 ## Building
@@ -151,17 +154,17 @@ C# / .NET code is compiled into Byte code and run in a VM similarly to Java. The
 
 In your application's root path, create a bin folder for your compiled assemblies.
 
-`mkdir -p bin`
+`mkdir bin`
 
 Now run the compiler and target the bin folder.
 
-`mcs -r:packages/Nancy.1.2.0/lib/net40/Nancy.dll -t:library SampleModule.cs -out:bin/SampleModule.dll`
+`mcs -r:packages/Nancy.1.4.4/lib/net40/Nancy.dll -t:library SampleModule.cs -out:bin/SampleModule.dll`
 
 mcs or `Mono Compiler Service` will compile your .cs file into a EXE or DLL.
 
 We are asking for a DLL by specifing the `-t:library` flag
 
-We also tell it to load the Nancy assembly from NuGet by specifing the `-r:packages/Nancy.1.2.0/lib/net40/Nancy.dll` flag.
+We also tell it to load the Nancy assembly from NuGet by specifing the `-r:packages/Nancy.1.4.4/lib/net40/Nancy.dll` flag.
 
 Finally we tell it to put the compiled DLL in bin by specifing the 
 `-out:bin/SampleModule.dll` flag.
@@ -179,8 +182,8 @@ The `-s` flag specifies symbolic links rather than hard-links.
 See the manpage for `ln` for more info.
 
 ```bash
-ln -s ../packages/Nancy.Hosting.Aspnet.1.2.0/lib/net40/Nancy.Hosting.Aspnet.dll bin/Nancy.Hosting.Aspnet.dll
-ln -s ../packages/Nancy.1.2.0/lib/net40/Nancy.dll bin/Nancy.dll
+ln -s ../packages/Nancy.Hosting.Aspnet.1.4.1/lib/net40/Nancy.Hosting.Aspnet.dll bin/Nancy.Hosting.Aspnet.dll
+ln -s ../packages/Nancy.1.4.4/lib/net40/Nancy.dll bin/Nancy.dll
 ```
 
 
@@ -206,10 +209,11 @@ As the project grows in complexity and we have multiple cs targets to compile we
 
 The make command and a Makefile is a great way to do this.
 
-Create a file in your application's root called __Makefile__ with following content.
+Create a file in your application's root called __Makefile__ with following content.  Please not that all lines that are indented must be indented
+with a tab character and not spaces.  This is a requirement of the __make__ program.
 
 ```bash
-DEPENDENCIES=-r:packages/Nancy.1.2.0/lib/net40/Nancy.dll
+DEPENDENCIES=-r:packages/Nancy.1.4.4/lib/net40/Nancy.dll
 
 all: sample
 
@@ -247,7 +251,7 @@ Now when we update our .cs files, all we need to do is type `make` to recompile 
 Adding additional files is as easy as defining additional tasks to compile additional assembiles
 
 ```bash
-DEPENDENCIES=-r:packages/Nancy.1.2.0/lib/net40/Nancy.dll
+DEPENDENCIES=-r:packages/Nancy.1.4.4/lib/net40/Nancy.dll
 
 all: sample template_example
 
@@ -272,8 +276,8 @@ We can implement this the same way in our Makefile
 
 clean:
   rm -rf bin/*
-  ln -s ../packages/Nancy.Hosting.Aspnet.1.2.0/lib/net40/Nancy.Hosting.Aspnet.dll bin/Nancy.Hosting.Aspnet.dll
-  ln -s ../packages/Nancy.1.2.0/lib/net40/Nancy.dll bin/Nancy.dll
+  ln -s ../packages/Nancy.Hosting.Aspnet.1.4.1/lib/net40/Nancy.Hosting.Aspnet.dll bin/Nancy.Hosting.Aspnet.dll
+  ln -s ../packages/Nancy.1.4.4/lib/net40/Nancy.dll bin/Nancy.dll
 
 
 (snip)
@@ -301,7 +305,7 @@ First, modify your packages/packages.config by adding
 
 ```html
   <package id="Microsoft.AspNet.Razor" version="3.2.3" />
-  <package id="Nancy.Viewengines.Razor" version="1.2.0" />
+  <package id="Nancy.Viewengines.Razor" version="1.4.3" />
 ```
 
 to the `<packages>` block
@@ -310,10 +314,10 @@ Your file should look like this:
 
 ```html
 <packages>
-  <package id="Nancy" version="1.2.0" />
-  <package id="Nancy.Hosting.Aspnet" version="1.2.0" />
+  <package id="Nancy" version="1.4.4" />
+  <package id="Nancy.Hosting.Aspnet" version="1.4.1" />
   <package id="Microsoft.AspNet.Razor" version="3.2.3" />
-  <package id="Nancy.Viewengines.Razor" version="1.2.0" />
+  <package id="Nancy.Viewengines.Razor" version="1.4.3" />
 </packages>
 ```
 
@@ -403,7 +407,7 @@ Views are stored in a views folder.
 
 First create a views folder in your application's root.
 
-`mkdir -p views`
+`mkdir views`
 
 Next create a new file in the views folder called __hello_world.cshtml__ with the following content:
 
@@ -424,14 +428,14 @@ If you followed the extra step of adding the *template_example* task to your Mak
 
 Otherwise you can add it to your Makefile now, or just invoke mcs manually to compile the additional template.
 
-`mcs -r:packages/Nancy.1.2.0/lib/net40/Nancy.dll -t:library TemplateSampleModule.cs -out:bin/TemplateSampleModule.dll`
+`mcs -r:packages/Nancy.1.4.4/lib/net40/Nancy.dll -t:library TemplateSampleModule.cs -out:bin/TemplateSampleModule.dll`
 
 ### Link new Razor assemblies
 
 Either from the command line or in our clean task, we should link the required Razor assemblies.
 
 ```bash
-  ln -s ../packages/Nancy.Viewengines.Razor.1.2.0/lib/net40/Nancy.ViewEngines.Razor.dll bin/Nancy.ViewEngines.Razor.dll
+  ln -s ../packages/Nancy.Viewengines.Razor.1.4.3/lib/net40/Nancy.ViewEngines.Razor.dll bin/Nancy.ViewEngines.Razor.dll
   ln -s ../packages/Microsoft.AspNet.Razor.3.2.3/lib/net45/System.Web.Razor.dll bin/System.Web.Razor.dll
 ```
 
@@ -440,10 +444,10 @@ or
 ```bash
 clean:
   rm -rf bin/*
-  ln -s ../packages/Nancy.Viewengines.Razor.1.2.0/lib/net40/Nancy.ViewEngines.Razor.dll bin/Nancy.ViewEngines.Razor.dll
+  ln -s ../packages/Nancy.Viewengines.Razor.1.4.3/lib/net40/Nancy.ViewEngines.Razor.dll bin/Nancy.ViewEngines.Razor.dll
   ln -s ../packages/Microsoft.AspNet.Razor.3.2.3/lib/net45/System.Web.Razor.dll bin/System.Web.Razor.dll
-  ln -s ../packages/Nancy.Hosting.Aspnet.1.2.0/lib/net40/Nancy.Hosting.Aspnet.dll bin/Nancy.Hosting.Aspnet.dll
-  ln -s ../packages/Nancy.1.2.0/lib/net40/Nancy.dll bin/Nancy.dll
+  ln -s ../packages/Nancy.Hosting.Aspnet.1.4.1/lib/net40/Nancy.Hosting.Aspnet.dll bin/Nancy.Hosting.Aspnet.dll
+  ln -s ../packages/Nancy.1.4.4/lib/net40/Nancy.dll bin/Nancy.dll
 ```
 
 
